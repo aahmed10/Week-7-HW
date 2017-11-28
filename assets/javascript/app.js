@@ -67,12 +67,26 @@ database.ref().on("child_added", function(childSnapShot, prevChildKey) {
   console.log("Departure: ", trainTime);
   console.log("Frequency: ", trainRate);
 
-  // calculate difference then convert. use train activity example code
+  // calculate differen then convert 
+  var diffTime = moment.duration(moment().diff(moment(trainTime, "HH:mm")), "milliseconds").asMinutes();
+  console.log("Difference in Time" + diffTime);
 
+  var timeRemaining = trainRate - (Math.floor(diffTime) % trainRate);
+  console.log(timeRemaining);
 
-  //put data into table
+  var nextTrain = diffTime > 0 ? moment().add(timeRemaining, 'minutes' ) : moment(trainTime, "HH:mm") ;
+  console.log("ARRIVAL TIME: " + moment(nextTrain).format("HH:mm"));
+  
+  //minutes until next train arrives, rounding up
+  var minTilTrain = Math.ceil(moment.duration(moment(nextTrain).diff(moment()), 'milliseconds').asMinutes());
+  console.log("MINUTES TILL TRAIN: " + minTilTrain);
+
+  //convert to HH:mm format from ms 
+  nextTrain = moment(nextTrain).format("HH:mm");
+
+  //Write Data From Database to Table
   var newTrainTableRow = "";
-  $("#traintimes > tbody").append("<tr><td>" + trainName + "</td><td>");
+  $("#traintimes > tbody").append("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" + trainRate + "</td><td>" + nextTrain + "</td><td>" + minTilTrain + "</td></tr>");
   
 });
 
